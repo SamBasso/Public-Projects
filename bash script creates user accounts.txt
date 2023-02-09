@@ -1,0 +1,78 @@
+#!/bin/bash
+if [[ -z $1 ]]; then
+	echo -e "\t| You must enter a filename"
+	echo -e "\t| Usage: $0 <<filename>>"
+	exit 1
+fi
+
+#Saving information to files:
+#Users first name:
+tail -n +2 $1 | cut -d"," -f2 > temp.txt
+echo "Username" > username.txt
+echo "=======" >> username.txt
+cat temp.txt >> username.txt
+#Users email:
+echo "Email" > email.txt
+echo "=======" >> email.txt
+tail -n+2 $1 | cut -d"," -f3 >> email.txt
+#Users full name:
+echo "FullName" > fullName.txt
+echo "=======" >> fullName.txt
+tail -n +2 $1 | cut -d"," -f 1,2 >> fullName.txt
+sed 's/^/|/' fullName.txt >> fullName1.txt
+
+#Create group:
+sudo groupadd langara
+
+for user in $(cat temp.txt); do
+	home="/home/langara/$user"
+	sudo mkdir -p $home
+	sudo useradd -d $home -s /bin/bash $user
+	sudo chown $user:$user $home
+	sudo usermod -a -G langara $user
+done
+
+echo -e "\t-------------------------------------------"
+
+echo -e "\tDisplaying Home Directories Permissions"
+for h in $(cat temp.txt); do
+       	ls -ld "/home/langara/$h"
+done
+echo -e "\t-------------------------------------------"
+sleep 5
+
+echo -e "\tDisplaying User Accounts"
+grep -P "\b\d{4}\b" /etc/passwd
+echo -e "\t-------------------------------------------"
+sleep 5
+
+echo -e "\tDisplaying Groups"
+for user in $(grep -P "\b\d{4}\b" /etc/passwd | cut -d":" -f1); do groups $user; done
+echo -e "\t-------------------------------------------"
+sleep 5
+
+echo "Password" > passwords.txt
+echo "=======" >> passwords.txt
+
+#set up 12 char password for each user:
+echo -e "\tChanging Users Passwords"
+for user in $(cat temp.txt); do
+	#use random function
+	x=$(echo "$user" | md5sum | head -c 9)
+	x=($x"1X!")
+	echo $x >> passwords.txt
+	echo -e "$x\n$x\n" | sudo passwd $user
+done
+
+#
+
+#paste all files together and save the login settings to 2810.login file:
+paste fullName1.txt email.txt username.txt passwords.txt | column -t > 2810.login
+
+#remove extra files:
+rm temp.txt
+rm fullName.txt
+rm fullName1.txt
+rm passwords.txt
+rm email.txt
+rm username.txt
