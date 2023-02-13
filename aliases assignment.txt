@@ -1,0 +1,22 @@
+# This file contain one line codes for certain actions in bash, each code is saved into an alias and into a .bash_aliases file;
+
+# Delete all users in /home/langara/2810/ :
+alias landel='for user in $(grep "/home/langara/2810" /etc/passwd | cut -d":" -f1); do sudo userdel $user; done' >> .bash_aliases
+
+# Delete all subdirectories in /home/langara/2810/ :
+alias subdel='rm -r /home/langara/2810/*' >> .bash_aliases
+
+# Display the groups of all human users (Assuming human user’s UID is exactly 4 digits) :
+alias dishuman='for user in $(grep -P "\b\d{4}\b" /etc/passwd | cut -d":" -f1); do groups $user; done' >> .bash_aliases
+
+#some extra info to help understand:
+# Username is first column; UID is third column; GID is fourth column;
+
+# Find top 5 running processes by RAM usage: 
+alias topram='ps aux --sort -%mem | head -5' >> .bash_aliases
+
+# Find top 5 running processes by CPU usage:
+alias topcpu='ps aux --sort -%cpu | head -5' >> .bash_aliases
+
+# Display free disk space in all physical partitions:
+alias freedisk='df -a | grep "^/dev/sd*"' >> .bash_aliases
