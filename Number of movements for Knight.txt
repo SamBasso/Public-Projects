@@ -1,0 +1,125 @@
+#include <iostream>
+#include <set>
+#include <queue>
+
+// arrays for all eight possible movements for a knight:
+int row[] = { 2, 2, -2, -2, 1, 1, -1, -1 };
+int col[] = { -1, 1, 1, -1, 2, -2, 2, -2 };
+
+//This function checks if (x, y) is a valid chessboard coordinate:
+bool isValid(int i, int j, int size) {
+	return (i >= 0 && i < size) && (j >= 0 && j < size);
+}
+
+
+
+// Node structure to use Breadth–first search (BFS) to solve the problem:
+struct Node{
+	int x, y, distance;
+	Node(int x, int y, int dist = 0) : x(x), y(y), distance(dist) {}
+	bool operator<(const Node& node) const {
+		return x < node.x || (x == node.x && y < node.y);
+	}
+};
+
+// This function finds and outputs the minimum number of steps taken by the knight from the source to reach the destination using BFS:
+void knight_moves(int size, Node src, Node dest){
+    int moves = 0;
+    bool reached = false;
+
+    // set to check if the matrix cell is visited before or not:
+    std::set<Node> visited;
+
+    // create a queue and enqueue the first node:
+    std::queue<Node> q;
+    q.push(src);
+
+    // create a queue to save the visited paths:
+    std::queue<Node> q2;
+
+    // loop untill queue is empty:
+    while (!q.empty()){
+        // dequeue front node and process it
+        Node node = q.front();
+        q.pop();
+        
+
+        int x = node.x;
+        int y = node.y;
+        int dist = node.distance;
+
+        // if the destination is reached:
+        if (x == dest.x && y == dest.y) {
+            reached = true;
+            moves = dist;
+            break;
+        }
+
+
+        // skip if the location is visited before
+        if (!visited.count(node)){
+            // mark the current node as visited
+            visited.insert(node);
+
+         //   q2.push(node);
+
+            // check for all eight possible movements for a knight
+            // and enqueue each valid movement
+            for (int i = 0; i < 8; i++){
+                // get the knight's valid position from the current position on
+                // the chessboard and enqueue it with +1 distance
+                int x1 = x + row[i];
+                int y1 = y + col[i];
+                
+                if (isValid(x1, y1, size)) {
+                   q.push({ x1, y1, dist + 1 });
+                  
+                }
+            }
+        }
+    }
+
+    // If the destination was reached:
+    if (reached) {
+        std::cout << "You made it in " << moves << " moves from [" << src.x << "," << src.y << "] to [" << dest.x << "," << dest.y << "]! Here is your path:" << std::endl;
+        std::cout<< "Started at [" << src.x << "," << src.y << "]" << std::endl;
+        while (!q2.empty()) {
+            Node node = q2.front();
+            q2.pop();
+            std::cout << "[" << node.x << "," << node.y << "]" << std::endl;
+        }
+        std::cout << "Ended at [" << dest.x << "," << dest.y << "]" << std::endl;
+    }
+    // If the path is not possible:
+    else {
+        std::cout << "Path is not possible!" << std::endl;
+    }
+}
+
+int main() {
+
+	// Create 8x8 chess board and necessary variables:
+    int BoardSize = 8;
+	int locationCol;
+	int locationRow;
+	int destinationCol;
+	int destinationRow;
+
+	// Asking user for locations and assigning the them to the variables:
+	std::cout << "Enter the current Knight's location:";
+	std::cin >> locationRow >> locationCol;
+	std::cout << std::endl;
+
+	std::cout << "Enter the destination location:";
+	std::cin >> destinationRow >> destinationCol;
+	std::cout << std::endl;
+
+    // Assigning the location variables to Nodes:
+    Node sourceLocation = { locationRow,locationCol };
+    Node destinationLocation = { destinationRow, destinationCol };
+
+	// Calling knight_moves function:
+    knight_moves(BoardSize, sourceLocation, destinationLocation);
+
+	return 0;
+}
