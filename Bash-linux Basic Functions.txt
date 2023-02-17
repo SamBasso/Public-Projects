@@ -1,0 +1,43 @@
+# To create a blank file and move it to a directory:
+
+echo '' > fileC.txt
+mv fileC.txt question1/BTS/Butter 
+
+# To create hardlinks:
+
+ln FILE LINK 
+ln milk.txt Jupiter.txt       #created a jupiter.txt file that is linked to milk.txt which was existing file.
+
+# To create soft/symbolic links:
+
+ln -s FILE LINK 
+
+# For changing permissions (+ to add) (- to remove):        
+
+chmod g-w question1/BTS/Dna
+
+chmod g-xrw question1/Kep1er
+
+chmod u-w,g-w question1/BTS/COLD_PLAY
+
+chmod o-r,o-x question1/RED_VELVET/Queendom
+
+# To list a directory with inodes ,links and files:
+
+ls -R -i -l name
+
+# To delete a directory:
+
+rm -r name
+
+# To find all files that contain “me” in any part of the filename in q2_p2 directory:
+
+find q2_p2  -name *me* -type f
+
+# To find all files that have write permission for others, print the list and remove their write permission:
+
+find q2_p2 -perm -o=w -type f -print -exec chmod o-w {} \;
+
+# To find all the files inside directories that contain the letter “z” (the directories that contain z):
+
+find q2_p2 -name *z* -type d -exec find {} -type f \;
