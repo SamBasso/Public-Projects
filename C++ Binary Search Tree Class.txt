@@ -1,0 +1,118 @@
+// Samuel Monteiro Basso    -   100379716
+// 2022-06-23
+// This BST.h file has the implementation of my Binary Search Tree class, with all its variables and functions.
+
+#ifndef BST_h
+#define BST_h
+
+#include <iostream>
+
+
+template <class T>
+class BSTNode {
+public:
+	BSTNode() {
+		left = right = nullptr;
+	}
+	BSTNode(const T &x) {
+		data = x;
+		left = right = nullptr;
+	}
+	
+	T data;
+	BSTNode<T>* left, * right;
+};
+
+template <class T>
+class BST {
+	public:
+		// This is the constructor with no arguments.
+		BST() {
+			root= nullptr;
+		}
+		// This is the destructor's helper function.
+		void destructorHelper(BSTNode<T> *node) {
+			if (node) {
+				destructorHelper(node->left);
+				destructorHelper(node->right);
+			}
+			delete node;
+		}
+		// This is the destructor.
+		~BST() {
+			destructorHelper(root);
+		}
+
+		// insert
+		void insert(const T&);
+		// remove
+		void remove(const T&);
+		// delete
+		void deleteByCopying(BSTNode<T>*& node);
+		
+		BSTNode<T>* root;
+
+};
+
+// This void function inserts an element in the binary search tree.
+template <class T>
+void BST<T>::insert(const T& x) {
+	BSTNode<T>* p = root, * prev = 0;
+	while (p != nullptr) {
+		prev = p;
+		if (x < p->data)
+			p = p->left;
+		else p = p->right;
+	}
+	if (root == nullptr)
+		root = new BSTNode<T>(x);
+	else if (x < prev->data)
+		prev->left = new BSTNode<T>(x);
+	else prev->right = new BSTNode<T>(x);
+}
+
+template <class T>
+void BST<T>::deleteByCopying(BSTNode<T>*& node) {
+	BSTNode<T>* previous, *tmp = node;
+	if (node->right == nullptr)
+		node = node->left;
+	else if (node->left == nullptr) 
+		node = node->right;
+	else {
+		tmp = node->left;
+		previous = node;
+		while (tmp->right != nullptr) {
+			previous = tmp;
+			tmp = tmp->right;
+		}
+		node->data = tmp->data;
+		if (previous == node) 
+			previous->left = tmp->left;
+		else previous->right = tmp->left;
+
+	}
+	delete tmp;
+}
+
+template <class T>
+void BST<T>::remove(const T& x) {
+	BSTNode<T>* node = root, * prev = nullptr;
+	while (node != nullptr) {
+		if (node->data == x) 
+			break;
+		prev = node;
+		if (x < node->data)
+			node = node->left;
+		else node = node->right;
+	}
+	if ((node != nullptr) && (node->data == x) )
+		deleteByCopying(node);
+	else if (root != nullptr)
+		std::cout << "Data was not found in the tree" << std::endl;
+	else std::cout << "The tree is empty" << std::endl;
+}
+
+
+
+
+#endif
